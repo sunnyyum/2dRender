@@ -24,6 +24,8 @@ import math
 import random
 import numpy as np
 
+import bmesh
+
 # Load rendering light parameters
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(BASE_DIR))
@@ -132,52 +134,20 @@ def obj_centened_camera_pos(dist, azimuth_deg, elevation_deg):
     z = (dist * math.sin(phi))
     return (x, y, z)
 
-
-def make_paint_list(mesh, faces):
-    # paint_list will contain all vertex color map indices to 
-    # be used for overpainting.
-    paint_list = []
-    i = 0
-    for poly in mesh.polygons:
-        face_is_selected = poly.index in faces
-        for idx in poly.loop_indices:
-            if face_is_selected:
-                paint_list.append(i)
-            i += 1
-
-
-    return paint_list
-
-
-def do_painting(color_map, paint_list, color_choice, mesh):
-    print("vertex color indices: ", paint_list)
-    for i in paint_list:
-        color_map.data[i].color = color_choice
-
-
-    bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-    bpy.ops.paint.vertex_color_set()
-
-
 def set_vertex_color(r = 1.0, g = 1.0, b = 1.0):
-    object = bpy.context.selected_objects[:]
-    object = object[0]
-    # for obj in bpy.data.objects:
-    #     if obj.type == 'MESH':
-    #         object = obj
+    object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
     mesh = object.data
 
     bpy.context.scene.objects.active = object
     object.select = True
 
     if mesh.vertex_colors:
-        # mesh.vertex_colors.active
-        vcol_layer = mesh.vertex_colors.active
+        mesh.vertex_colors.active
+        # vcol_layer = mesh.vertex_colors.active
     else:
-        # mesh.vertex_colors.new()
-        vcol_layer = mesh.vertex_colors.new()
-
-    mesh.vertex_colors.active
+        mesh.vertex_colors.new()
+        # vcol_layer = mesh.vertex_colors.new()
+    # mesh.vertex_colors.active
     for poly in mesh.polygons:
         for idx in poly.loop_indices:
             mesh.vertex_colors[0].data[idx].color = (r,g,b)
@@ -185,50 +155,15 @@ def set_vertex_color(r = 1.0, g = 1.0, b = 1.0):
             # vcol_layer.data[idx].color = (r,g,b)
             # print(vcol_layer.data[idx].color)
 
+    # bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.mode_set(mode='VERTEX_PAINT')
     bpy.ops.object.mode_set(mode='OBJECT')
-    '''
-    object = bpy.context.selected_objects[:]
-    mesh = object[0].data
-    bpy.context.scene.objects.active = object[0]
 
-    bpy.context.scene.objects.active = object[0]
-    object[0].select = True
-
-    # common part
-    color_map_collection = mesh.vertex_colors
-    if len(color_map_collection) == 0:
-        color_map_collection.new()
-
-    # color_map = color_map_collection['Col']
-    color_map = color_map_collection.active
-
-    bpy.ops.object.mode_set(mode='OBJECT')
-    faces = [f.index for f in mesh.polygons if f.select]
-    paint_list = make_paint_list(mesh, faces)
-
-    #do_painting
-    # do_painting(color_map, paint_list, color_choice = (r,g,b), mesh=mesh)
-    for i in paint_list:
-        color_map.data[i].color = (r,g,b)
-
-    color_map_collection.active = color_map
-    # mesh.vertex_colors = color_map_collection
-
-    bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-    bpy.ops.paint.vertex_color_set()
-
-    bpy.ops.object.mode_set(mode='OBJECT')
-
-    for poly in mesh.polygons:
-        for idx in poly.loop_indices:
-            print(color_map.data[idx].color)
-    '''
 
 def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # set object color
-    object = bpy.context.selected_objects[:]
-    mesh = object[0].data
+    object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
+    mesh = object.data
 
     # common part
     color_map_collection = mesh.vertex_colors
@@ -241,14 +176,23 @@ def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # common
     for poly in mesh.polygons:
         for idx in poly.loop_indices:
+            # print(color_map.data[idx].color)
             color_map.data[idx].color = (r, g, b)
+            # print(color_map.data[idx].color)
 
     # material
     mat = bpy.data.materials.new('vertex_material')
+
+    print(bpy.data.materials[0].ambient)
     mat.use_vertex_color_paint = True
-    # mat.use_vertex_color_light = True  # material affected by lights
+    mat.use_vertex_color_light = True  # material affected by lights
+    mat.use_shadows = True
+    mat.ambient = 0.8
     mesh.materials.append(mat)
-    # print(mesh.materials['vertex_material'].diffuse_color)
+    # common
+
+
+
 
 # Input parameters
 shape_file = sys.argv[-5]
@@ -272,10 +216,9 @@ bpy.context.scene.render.alpha_mode = 'TRANSPARENT' #background color --> needs 
 #bpy.context.scene.render.use_raytrace = False
 
 
-
-# set_material_color(r = 1.0, g = 1.0, b = 1.0)
-set_vertex_color(r = 1.0, g = 0.0, b = 1.0)
-
+# set color
+set_material_color(r = 1.0, g = 1.0, b = 1.0)
+# set_vertex_color(r = 1.0, g = 0.0, b = 1.0)
 
 # clear light energy
 bpy.data.objects['Lamp'].data.energy = 0
@@ -286,9 +229,6 @@ camObj = bpy.data.objects['Camera']
 # camObj.data.lens_unit = 'FOV'
 # camObj.data.angle = 0.2
 
-# set differenct color ---> needs to be fixed
-# for item in bpy.data.materials:
-#     item.diffuse_color = (1, 0, 0)
 
 # set lights
 bpy.ops.object.select_all(action='TOGGLE')

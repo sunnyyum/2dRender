@@ -150,8 +150,9 @@ def set_vertex_color(r = 1.0, g = 1.0, b = 1.0):
     # mesh.vertex_colors.active
     for poly in mesh.polygons:
         for idx in poly.loop_indices:
+
+            print(mesh.vertex_colors[0].data[idx].color)
             mesh.vertex_colors[0].data[idx].color = (r,g,b)
-            # print(mesh.vertex_colors[0].data[idx].color)
             # vcol_layer.data[idx].color = (r,g,b)
             # print(vcol_layer.data[idx].color)
 
@@ -159,6 +160,56 @@ def set_vertex_color(r = 1.0, g = 1.0, b = 1.0):
     bpy.ops.object.mode_set(mode='VERTEX_PAINT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
+class MapVertexColors(bpy.types.Operator):
+    bl_idname = "object.simple_operator"
+    bl_label = "Set Vertex Color..."
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # color = bpy.props.FloatVectorProperty(
+    #     name="Color",
+    #     description="Color",
+    #     subtype='COLOR',
+    #     min=0.0,
+    #     max=1.0)
+
+
+    # def poll(cls, context):
+    #     return context.mode == 'EDIT_MESH'
+
+    def execute(self, context):
+        object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
+        mesh = object.data
+
+        bpy.context.scene.objects.active = object
+        object.select = True
+
+        if mesh.vertex_colors:
+            mesh.vertex_colors.active
+            # vcol_layer = mesh.vertex_colors.active
+        else:
+            mesh.vertex_colors.new()
+            # vcol_layer = mesh.vertex_colors.new()
+        # mesh.vertex_colors.active
+        for poly in mesh.polygons:
+            for idx in poly.loop_indices:
+                mesh.vertex_colors[0].data[idx].color = (1.0, 0.0, 1.0)
+                # print(mesh.vertex_colors[0].data[idx].color)
+                # vcol_layer.data[idx].color = (r,g,b)
+                # print(vcol_layer.data[idx].color)
+
+        # bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='VERTEX_PAINT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        return {'FINISHED'}
+
+    # def invoke(self, context, event):
+    #     return context.window_manager.invoke_props_dialog(self)
+
+
+def register():
+    bpy.utils.register_class(MapVertexColors)
+    bpy.ops.object.simple_operator()
 
 def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # set object color
@@ -217,7 +268,10 @@ bpy.context.scene.render.alpha_mode = 'TRANSPARENT' #background color --> needs 
 
 
 # set color
-set_material_color(r = 1.0, g = 1.0, b = 1.0)
+# set_material_color(r = 1.0, g = 1.0, b = 1.0)
+
+# this version of setting color isn't working
+# register()
 # set_vertex_color(r = 1.0, g = 0.0, b = 1.0)
 
 # clear light energy

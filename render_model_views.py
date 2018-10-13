@@ -233,7 +233,6 @@ def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # material
     mat = bpy.data.materials.new('vertex_material')
 
-    print(bpy.data.materials[0].ambient)
     mat.use_vertex_color_paint = True
     mat.use_vertex_color_light = True  # material affected by lights
     mat.use_shadows = True
@@ -256,6 +255,7 @@ if not os.path.exists(syn_images_folder):
 #syn_images_folder = os.path.join(g_syn_images_folder, shape_synset, shape_md5)
 view_params = [[float(x) for x in line.strip().split(' ')] for line in open(shape_view_params_file).readlines()]
 bg_r, bg_g, bg_b = view_params[0][4], view_params[0][5], view_params[0][6]
+obj_r, obj_g, obj_b = view_params[0][7], view_params[0][8], view_params[0][9]
 
 if not os.path.exists(syn_images_folder):
     os.makedirs(syn_images_folder)
@@ -270,7 +270,7 @@ bpy.types.World.horizon_color=(1,0,1)
 
 
 # set color
-# set_material_color(r = 1.0, g = 1.0, b = 1.0)
+set_material_color(r = obj_r, g = obj_g, b = obj_b)
 
 # this version of setting color isn't working
 # register()

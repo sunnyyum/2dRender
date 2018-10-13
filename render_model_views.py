@@ -24,7 +24,6 @@ import math
 import random
 import numpy as np
 
-import bmesh
 
 # Load rendering light parameters
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -256,15 +255,18 @@ if not os.path.exists(syn_images_folder):
     os.mkdir(syn_images_folder)
 #syn_images_folder = os.path.join(g_syn_images_folder, shape_synset, shape_md5)
 view_params = [[float(x) for x in line.strip().split(' ')] for line in open(shape_view_params_file).readlines()]
+bg_r, bg_g, bg_b = view_params[0][4], view_params[0][5], view_params[0][6]
 
 if not os.path.exists(syn_images_folder):
     os.makedirs(syn_images_folder)
 
 bpy.ops.import_scene.obj(filepath=shape_file)
 
-bpy.context.scene.render.alpha_mode = 'TRANSPARENT' #background color --> needs to be fixed
-#bpy.context.scene.render.use_shadows = False
-#bpy.context.scene.render.use_raytrace = False
+bpy.context.scene.render.alpha_mode = 'SKY' #background color --> needs to be fixed
+bpy.data.worlds['World'].horizon_color=(bg_r,bg_g,bg_b)
+
+bpy.types.World.horizon_color=(1,0,1)
+
 
 
 # set color
@@ -291,7 +293,6 @@ if 'Lamp' in list(bpy.data.objects.keys()):
 bpy.ops.object.delete()
 
 # YOUR CODE START HERE
-
 for param in view_params:
     azimuth_deg = param[0]
     elevation_deg = param[1]

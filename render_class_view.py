@@ -14,17 +14,19 @@ parser.add_argument('-a', '--azimuth', default='45')
 parser.add_argument('-e', '--elevation', default='20')
 parser.add_argument('-t', '--tilt', default='0')
 parser.add_argument('-d', '--distance', default='2.0')
+parser.add_argument('-bg', '--background_color', help='Background Color', default='1.0,1.0,1.0')
 parser.add_argument('-o', '--output_img', help='Output img filename.', default=osp.join(BASE_DIR, 'demo_img.png'))
 args = parser.parse_args()
 
 blank_file = osp.join(g_blank_blend_file_path)
 render_code = osp.join(g_render4cnn_root_folder, './render_model_views.py') #file path
+view_bg_color = [x for x in args.background_color.split(',')]
 
 # MK TEMP DIR
 temp_dirname = tempfile.mkdtemp()
 view_file = osp.join(temp_dirname, 'view.txt')
 view_fout = open(view_file,'w')
-view_fout.write(' '.join([args.azimuth, args.elevation, args.tilt, args.distance]))
+view_fout.write(' '.join([args.azimuth, args.elevation, args.tilt, args.distance, view_bg_color[0], view_bg_color[1], view_bg_color[2]]))
 view_fout.close()
 
 try:

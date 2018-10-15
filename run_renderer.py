@@ -58,4 +58,4 @@ if not os.path.exists(syn_images_folder):
 
 
 
-take_photo(image_prefix, num_images=1, distance=3.0, bg_r=1.0, bg_g=1.0, bg_b=1.0, obj_r=1, obj_g=0, obj_b=1)
+take_photo(image_prefix, num_images=12, distance=3.0, bg_r=0.0, bg_g=0.0, bg_b=1.0, obj_r=1, obj_g=0.3, obj_b=0.6)

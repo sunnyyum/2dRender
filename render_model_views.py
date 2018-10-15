@@ -86,7 +86,6 @@ def camPosToQuaternion(cx, cy, cz):
         yaw = 2 * math.pi - yaw
     pitch = 0
     tmp = min(max(tx*cx + ty*cy, -1),1)
-    #roll = math.acos(tx * cx + ty * cy)
     roll = math.acos(tmp)
     if cz < 0:
         roll = -roll
@@ -133,83 +132,6 @@ def obj_centened_camera_pos(dist, azimuth_deg, elevation_deg):
     z = (dist * math.sin(phi))
     return (x, y, z)
 
-def set_vertex_color(r = 1.0, g = 1.0, b = 1.0):
-    object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
-    mesh = object.data
-
-    bpy.context.scene.objects.active = object
-    object.select = True
-
-    if mesh.vertex_colors:
-        mesh.vertex_colors.active
-        # vcol_layer = mesh.vertex_colors.active
-    else:
-        mesh.vertex_colors.new()
-        # vcol_layer = mesh.vertex_colors.new()
-    # mesh.vertex_colors.active
-    for poly in mesh.polygons:
-        for idx in poly.loop_indices:
-
-            print(mesh.vertex_colors[0].data[idx].color)
-            mesh.vertex_colors[0].data[idx].color = (r,g,b)
-            # vcol_layer.data[idx].color = (r,g,b)
-            # print(vcol_layer.data[idx].color)
-
-    # bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-    bpy.ops.object.mode_set(mode='OBJECT')
-
-class MapVertexColors(bpy.types.Operator):
-    bl_idname = "object.simple_operator"
-    bl_label = "Set Vertex Color..."
-    bl_options = {'REGISTER', 'UNDO'}
-
-    # color = bpy.props.FloatVectorProperty(
-    #     name="Color",
-    #     description="Color",
-    #     subtype='COLOR',
-    #     min=0.0,
-    #     max=1.0)
-
-
-    # def poll(cls, context):
-    #     return context.mode == 'EDIT_MESH'
-
-    def execute(self, context):
-        object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
-        mesh = object.data
-
-        bpy.context.scene.objects.active = object
-        object.select = True
-
-        if mesh.vertex_colors:
-            mesh.vertex_colors.active
-            # vcol_layer = mesh.vertex_colors.active
-        else:
-            mesh.vertex_colors.new()
-            # vcol_layer = mesh.vertex_colors.new()
-        # mesh.vertex_colors.active
-        for poly in mesh.polygons:
-            for idx in poly.loop_indices:
-                mesh.vertex_colors[0].data[idx].color = (1.0, 0.0, 1.0)
-                # print(mesh.vertex_colors[0].data[idx].color)
-                # vcol_layer.data[idx].color = (r,g,b)
-                # print(vcol_layer.data[idx].color)
-
-        # bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.mode_set(mode='VERTEX_PAINT')
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        return {'FINISHED'}
-
-    # def invoke(self, context, event):
-    #     return context.window_manager.invoke_props_dialog(self)
-
-
-def register():
-    bpy.utils.register_class(MapVertexColors)
-    bpy.ops.object.simple_operator()
-
 def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # set object color
     object = [obj for obj in bpy.context.selected_objects[:] if obj.type == 'MESH'][0]
@@ -238,7 +160,6 @@ def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     mat.use_shadows = True
     mat.ambient = 0.8
     mesh.materials.append(mat)
-    # common
 
 
 
@@ -252,7 +173,7 @@ syn_images_folder = sys.argv[-1]
 
 if not os.path.exists(syn_images_folder):
     os.mkdir(syn_images_folder)
-#syn_images_folder = os.path.join(g_syn_images_folder, shape_synset, shape_md5)
+
 view_params = [[float(x) for x in line.strip().split(' ')] for line in open(shape_view_params_file).readlines()]
 bg_r, bg_g, bg_b = view_params[0][4], view_params[0][5], view_params[0][6]
 obj_r, obj_g, obj_b = view_params[0][7], view_params[0][8], view_params[0][9]
@@ -262,28 +183,19 @@ if not os.path.exists(syn_images_folder):
 
 bpy.ops.import_scene.obj(filepath=shape_file)
 
-bpy.context.scene.render.alpha_mode = 'SKY' #background color --> needs to be fixed
+#set background color
+bpy.context.scene.render.alpha_mode = 'SKY'
 bpy.data.worlds['World'].horizon_color=(bg_r,bg_g,bg_b)
-
-bpy.types.World.horizon_color=(1,0,1)
-
 
 
 # set color
 set_material_color(r = obj_r, g = obj_g, b = obj_b)
 
-# this version of setting color isn't working
-# register()
-# set_vertex_color(r = 1.0, g = 0.0, b = 1.0)
-
 # clear light energy
 bpy.data.objects['Lamp'].data.energy = 0
 
-#m.subsurface_scattering.use = True
 
 camObj = bpy.data.objects['Camera']
-# camObj.data.lens_unit = 'FOV'
-# camObj.data.angle = 0.2
 
 
 # set lights
@@ -317,16 +229,6 @@ for param in view_params:
     bpy.ops.object.lamp_add(type='POINT', view_align=False, location=(lx, ly, lz))
     bpy.data.objects['Point'].data.energy = g_syn_light_energy_mean
     bpy.data.lamps['Point'].use_diffuse = True
-
-
-    # set point lights --> random
-    # for i in range(random.randint(light_num_lowbound,light_num_highbound)):
-    #     light_azimuth_deg = np.random.uniform(g_syn_light_azimuth_degree_lowbound, g_syn_light_azimuth_degree_highbound)
-    #     light_elevation_deg  =  np.random.uniform(g_syn_light_elevation_degree_lowbound, g_syn_light_elevation_degree_highbound)
-    #     light_dist = np.random.uniform(light_dist_lowbound, light_dist_highbound)
-    #     lx, ly, lz = obj_centened_camera_pos(light_dist, light_azimuth_deg, light_elevation_deg)
-    #     bpy.ops.object.lamp_add(type='POINT', view_align = False, location=(lx, ly, lz))
-    #     bpy.data.objects['Point'].data.energy = np.random.normal(g_syn_light_energy_mean, g_syn_light_energy_std)
 
 
     cx, cy, cz = obj_centened_camera_pos(rho, azimuth_deg, elevation_deg)

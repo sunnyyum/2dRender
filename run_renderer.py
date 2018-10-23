@@ -51,14 +51,11 @@ else:
 # set filepath
 syn_images_folder = os.path.join(BASE_DIR, 'demo_images')
 model_name = 'chair001'
-# image_name = 'demo_img.png'
 image_prefix = 'demo_img'
 if not os.path.exists(syn_images_folder):
     os.mkdir(syn_images_folder)
     os.mkdir(os.path.join(syn_images_folder, model_name))
 
-# if not os.path.exists(os.path.join(syn_images_folder, model_name)):
-#     os.mkdir(os.path.join(syn_images_folder, model_name))
 
 
 

@@ -9,7 +9,7 @@ from global_variables import *
 
 
 parser = argparse.ArgumentParser(description='Render Model Images of a certain class and view')
-parser.add_argument('-m', '--model_file', help='CAD Model obj filename', default=osp.join(BASE_DIR,'sample_model/chair_0050.obj'))
+parser.add_argument('-m', '--model_file', help='CAD Model obj filename', default=osp.join(BASE_DIR,'sample_model/chair_0001.obj'))
 parser.add_argument('-a', '--azimuth', default='45')
 parser.add_argument('-e', '--elevation', default='20')
 parser.add_argument('-t', '--tilt', default='0')

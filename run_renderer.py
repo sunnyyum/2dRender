@@ -6,8 +6,8 @@ from datetime import datetime
 random.seed(datetime.now())
 
 def take_photo(image_prefix, num_images=1, angle = 10.0, tilt = 0.0, distance = 2.0,
-               bg_r = 1.0, bg_g = 1.0, bg_b = 1.0, obj_r = 1.0, obj_g = 1.0, obj_b = 1.0):
-    start_angle = 0.0
+               bg_r = 1.0, bg_g = 1.0, bg_b = 1.0, obj_r = 1.0, obj_g = 1.0, obj_b = 1.0, img_sx = 960, img_sy = 540):
+    start_angle = 270.0
     interval = 360.0 / num_images
     bg_color = str(bg_r)+","+str(bg_g)+","+str(bg_b)
     obj_color = str(obj_r)+","+str(obj_g)+","+str(obj_b)
@@ -17,14 +17,17 @@ def take_photo(image_prefix, num_images=1, angle = 10.0, tilt = 0.0, distance = 
         v = [azimuth, angle, tilt, distance]
         print ">> Selected view: ", v
         python_cmd = 'python %s -a %s -e %s -t %s -d %s -bg %s -oc %s -o %s' % (os.path.join(BASE_DIR, 'render_class_view.py'),
-                                                                  str(v[0]), str(v[1]), str(v[2]), str(v[3]), bg_color, obj_color,
-                                                                  os.path.join(syn_images_folder, model_name, image_name))
+                                                                                str(v[0]), str(v[1]), str(v[2]), str(v[3]),
+                                                                                bg_color, obj_color, os.path.join(syn_images_folder, model_name, image_name))
         print ">> Running rendering command: \n \t %s" % (python_cmd)
         os.system('%s %s' % (python_cmd, io_redirect))
         # show result
         print(">> Displaying rendered image ...")
         im = Image.open(os.path.join(syn_images_folder, model_name, image_name))
         im.show()
+
+        im.resize((img_sx, img_sy))
+        im.save(os.path.join(syn_images_folder, model_name, image_name))
 
 
 #start code from here
@@ -54,8 +57,11 @@ if not os.path.exists(syn_images_folder):
     os.mkdir(syn_images_folder)
     os.mkdir(os.path.join(syn_images_folder, model_name))
 
+# if not os.path.exists(os.path.join(syn_images_folder, model_name)):
+#     os.mkdir(os.path.join(syn_images_folder, model_name))
 
 
 
 
-take_photo(image_prefix, num_images=12, distance=3.0, bg_r=0.0, bg_g=0.0, bg_b=1.0, obj_r=1, obj_g=0.3, obj_b=0.6)
+
+take_photo(image_prefix, num_images=1, distance=3.5,bg_r=1.0, bg_g=1.0, bg_b=1.0, obj_r=(170.0/255), obj_g=(170.0/255), obj_b=(170.0/255))

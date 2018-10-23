@@ -148,9 +148,7 @@ def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     # common
     for poly in mesh.polygons:
         for idx in poly.loop_indices:
-            # print(color_map.data[idx].color)
             color_map.data[idx].color = (r, g, b)
-            # print(color_map.data[idx].color)
 
     # material
     mat = bpy.data.materials.new('vertex_material')
@@ -159,6 +157,7 @@ def set_material_color(r = 1.0, g = 1.0, b = 1.0):
     mat.use_vertex_color_light = True  # material affected by lights
     mat.use_shadows = True
     mat.ambient = 0.8
+    mat.specular_shader='PHONG'
     mesh.materials.append(mat)
 
 
@@ -183,7 +182,8 @@ if not os.path.exists(syn_images_folder):
 
 bpy.ops.import_scene.obj(filepath=shape_file)
 
-#set background color
+
+# set background color
 bpy.context.scene.render.alpha_mode = 'SKY'
 bpy.data.worlds['World'].horizon_color=(bg_r,bg_g,bg_b)
 
